@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "build:rollup": "rollup index.js --file dist.js --format cjs",
+    "build": "npm run build:rollup && npm run pkg:build",
+    "pkg:build": "pkg dist.js --out-path dist --targets node16-linux-x64,node16-macos-x64,node16-win-x64 --assets publics",
+    "build:win": "npm run build:rollup && pkg dist.js --out-path dist --targets node16-win-x64 --assets public",
+    "format": "prettier --write ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.18.2",
+    "pkg": "^5.8.1",
+    "prettier": "^3.2.5",
+    "rollup": "^4.9.6"
+  },
+  "description": ""
+}
