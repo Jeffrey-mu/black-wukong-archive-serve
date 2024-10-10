@@ -9,6 +9,18 @@ const router = Router()
 router.post('/setLocalConfig', (req, res) => {
   console.log(req.params)
   const { gamePath, saveDir, useSave } = req.body
+  if (!gamePath && !useSave) {
+    res.send({
+      code: 200,
+      message: '设置失败，请配置游戏路径和存档路径！',
+      data: {
+        gamePath: '',
+        saveDir: '',
+        useSave: '',
+      }
+    })
+    return
+  }
   let config = { gamePath, saveDir: saveDir || generateRandomString(), useSave }
   fs.writeFileSync('config.json', JSON.stringify(config))
   consola.success("配置写入成功！")
@@ -21,6 +33,13 @@ router.post('/setLocalConfig', (req, res) => {
 
 router.get('/getArchiveList', (req, res) => {
   const { gamePath } = getConfig()
+  if (!gamePath) {
+    res.send({
+      code: 200,
+      data: []
+    })
+    return
+  }
   const archiveList = fs.readdirSync(gamePath).map(item => ({ ...fs.statSync(`${gamePath}/${item}`), name: item })).filter(item => isArchiveFile(item.name))
   res.send({
     code: 200,
@@ -30,6 +49,13 @@ router.get('/getArchiveList', (req, res) => {
 
 router.get('/getMyArchiveList', (req, res) => {
   const { gamePath, saveDir } = getConfig()
+  if (!gamePath) {
+    res.send({
+      code: 200,
+      data: []
+    })
+    return
+  }
   const saveDirPath = `${gamePath}/${saveDir}`
   const archiveList = fs.readdirSync(saveDirPath).map(item => ({ ...fs.statSync(`${saveDirPath}/${item}`), name: item }))
   res.send({
@@ -62,7 +88,7 @@ router.post('/useArchive', (req, res) => {
   const { name } = req.body
   const saveDirPath = `${gamePath}/${saveDir}`
   fs.writeFileSync(`${gamePath}/ArchiveSaveFile.${useSave}.sav`, fs.readFileSync(`${saveDirPath}/${name}`))
-  
+
   consola.success(`${saveDirPath}/${name}使用成功！`)
   consola.success(`重写路径：${gamePath}/ArchiveSaveFile.${useSave}.sav`)
   res.send({
