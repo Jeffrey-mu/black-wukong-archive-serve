@@ -1,7 +1,6 @@
 import { Router } from 'express'
 import { generateRandomString, isArchiveFile } from '../utils/index.js'
 import fs from "fs"
-import { consola } from "consola"
 
 
 const router = Router()
@@ -24,11 +23,11 @@ router.post('/setLocalConfig', (req, res) => {
   let config = { gamePath, saveDir: saveDir || generateRandomString(), useSave }
   const saveDirPath = `${gamePath}/${saveDir}`
   if (!fs.existsSync(saveDirPath)) {
-    consola.success(`${saveDirPath}创建成功！`)
+    console.log(`${saveDirPath}创建成功！`)
     fs.mkdirSync(saveDirPath)
   }
   fs.writeFileSync('config.json', JSON.stringify(config))
-  consola.success("配置写入成功！")
+  console.log("配置写入成功！")
   res.send({
     code: 200,
     message: '设置成功',
@@ -74,13 +73,13 @@ router.post('/add', (req, res) => {
   const { name } = req.body
   const saveDirPath = `${gamePath}/${saveDir}`
   if (!fs.existsSync(saveDirPath)) {
-    consola.success(`${saveDirPath}创建成功！`)
+    console.log(`${saveDirPath}创建成功！`)
     fs.mkdirSync(saveDirPath)
   }
   const archiveList = fs.readdirSync(gamePath).map(item => ({ ...fs.statSync(`${gamePath}/${item}`), name: item })).filter(item => isArchiveFile(item.name)).sort((a, b) => b.mtimeMs - a.mtimeMs)
   let useFile = `${gamePath}/${archiveList[0].name}`
   fs.copyFileSync(useFile, `${saveDirPath}/${name}`)
-  consola.success(`${saveDirPath}/${name}添加成功！`)
+  console.log(`${saveDirPath}/${name}添加成功！`)
   res.send({
     code: 200,
     message: '添加成功',
@@ -94,8 +93,8 @@ router.post('/useArchive', (req, res) => {
   const saveDirPath = `${gamePath}/${saveDir}`
   fs.writeFileSync(`${gamePath}/ArchiveSaveFile.${useSave}.sav`, fs.readFileSync(`${saveDirPath}/${name}`))
 
-  consola.success(`${saveDirPath}/${name}使用成功！`)
-  consola.success(`重写路径：${gamePath}/ArchiveSaveFile.${useSave}.sav`)
+  console.log(`${saveDirPath}/${name}使用成功！`)
+  console.log(`重写路径：${gamePath}/ArchiveSaveFile.${useSave}.sav`)
   res.send({
     code: 200,
     message: '使用成功！',
@@ -103,6 +102,7 @@ router.post('/useArchive', (req, res) => {
   })
 })
 function getConfig() {
+  if (!fs.existsSync('config.json')) return { gamePath: '', saveDir: '', useSave: '' }
   return JSON.parse(fs.readFileSync('config.json'))
 }
 export default router
