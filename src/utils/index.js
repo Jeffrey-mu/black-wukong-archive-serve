@@ -12,7 +12,5 @@ export function generateRandomString(length = 20) {
 
 export function isArchiveFile(fileName) {
   const regex = /^ArchiveSaveFile\.(10|[1-9])\.sav$/
-  console.log(fileName)
-  console.log(regex.test(fileName))
   return regex.test(fileName)
 }

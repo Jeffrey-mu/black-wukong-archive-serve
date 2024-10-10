@@ -57,6 +57,20 @@ router.post('/add', (req, res) => {
   })
 })
 
+router.post('/useArchive', (req, res) => {
+  const { saveDir, gamePath, useSave } = getConfig()
+  const { name } = req.body
+  const saveDirPath = `${gamePath}/${saveDir}`
+  fs.writeFileSync(`${gamePath}/ArchiveSaveFile.${useSave}.sav`, fs.readFileSync(`${saveDirPath}/${name}`))
+  
+  consola.success(`${saveDirPath}/${name}使用成功！`)
+  consola.success(`重写路径：${gamePath}/ArchiveSaveFile.${useSave}.sav`)
+  res.send({
+    code: 200,
+    message: '使用成功！',
+    data: []
+  })
+})
 function getConfig() {
   return JSON.parse(fs.readFileSync('config.json'))
 }
