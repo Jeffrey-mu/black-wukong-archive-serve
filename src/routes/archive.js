@@ -22,6 +22,11 @@ router.post('/setLocalConfig', (req, res) => {
     return
   }
   let config = { gamePath, saveDir: saveDir || generateRandomString(), useSave }
+  const saveDirPath = `${gamePath}/${saveDir}`
+  if (!fs.existsSync(saveDirPath)) {
+    consola.success(`${saveDirPath}创建成功！`)
+    fs.mkdirSync(saveDirPath)
+  }
   fs.writeFileSync('config.json', JSON.stringify(config))
   consola.success("配置写入成功！")
   res.send({
